@@ -3,7 +3,7 @@
 import sys
 
 from random import *
-from queue import *
+from Queue import *
 from bisect import *
 from math import *
 
@@ -24,6 +24,9 @@ packetCount = -1 # count of packets sent; used to limit simulation
 
 
 class Event:
+    """
+    Event class
+    """
 
     def __init__(self, time=0, eventType=0, packetNumber = -1):
         self.time = time
@@ -43,6 +46,9 @@ class Event:
 
 
 class Packet:
+    """
+    Packet Class
+    """
 
     def __init__(self, serviceTime = 0):
         self.serviceTime = serviceTime
@@ -50,18 +56,24 @@ class Packet:
             Packet.packetNumber = Packet.packetNumber+1
             self.packetNumber = Packet.packetNumber
         else:
-            Packet.packetNumber = 0
-            self.packetNumber = 0
+            Packet.packetNumber = 1
+            self.packetNumber = 1
 
 
 
-def exp_dist(rate): # exponential distribution
+def exp_dist(rate):
+    """
+    Exponential Distribution
+    """ 
     u = random()
     return ((-1/rate) * log(1-u))
 
 
 
-def arrival(pq, eventList): # process current arrival event
+def arrival(pq, eventList):
+    """
+    Process and Generate Arrival Events
+    """ 
     currentEvent = eventList[currentIndex]
     
 
@@ -80,15 +92,18 @@ def arrival(pq, eventList): # process current arrival event
         dtime = serviceTime+currentEvent.time
         insort(eventList, Event(time=dtime, eventType=DEPARTURE))
 
-    if(not pq.full()): # enqueue packet
+    try: # enqueue packet
         pq.put(item = p, block = False)
-    else: # queue is full, drop packet
+    except (Full): # queue is full, drop packet
         currentEvent.msg = "PACKET DROPPED"
         print ("Dropping %dth Packet" % p.packetNumber)
 
 
 
-def departure(pq, eventList): # process current departure event
+def departure(pq, eventList):
+    """
+    Process and Generate Departure Events
+    """ 
     currentEvent = eventList[currentIndex]
 
     if(not pq.empty()): # send packet if one exists in queue
@@ -105,15 +120,22 @@ def main():
         print("usage:", str(sys.argv[0]), "[queue] [mu] [lambda]")
         return
 
-    maxQueueLen= int(sys.argv[1])
-    arrivalRate = float(sys.argv[2])
-    departureRate = float(sys.argv[3])
+    global MAX_PACKETS
+    global ARRIVAL_RATE
+    global DEPARTURE_RATE
+    MAX_PACKETS = int(sys.argv[1])
+    ARRIVAL_RATE = float(sys.argv[2])
+    DEPARTURE_RATE = float(sys.argv[3])
 
-    pq = Queue(maxQueueLen) # packet queue
+    print "MAX_PACKETS: %d" % MAX_PACKETS
+    print "ARRIVAL_RATE: %d" % ARRIVAL_RATE
+    print "DEPARTURE_RATE: %f" % DEPARTURE_RATE
+
+    pq = Queue(MAX_PACKETS) # packet queue
 
     seed(1) # seed for generating random distributions
     
-		# initialize event list with arrival event
+    # initialize event list with arrival event
     currentEvent = Event(time=0, eventType=ARRIVAL)
     eventList = sorted([currentEvent])
     currentIndex = 0
@@ -124,7 +146,7 @@ def main():
     nextArrival = Event(time=nextArrivalTime, eventType=ARRIVAL)
     insort(eventList, nextArrival)
     
-		# Begin simulation with no packets simulated
+	# Begin simulation with no packets simulated
     global packetCount
     packetCount = 0
 
