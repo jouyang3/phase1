@@ -1,4 +1,4 @@
-#!/bin/python
+#!/bin/python2.7
 
 import sys
 
