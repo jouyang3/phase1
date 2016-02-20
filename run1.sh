@@ -6,5 +6,5 @@ queue=9999999 # "infinite" queue size
 
 for lambda in $lambdas; do
 	echo "Running with mu=$mu, queue=$queue, lambda=$lambda"
-	./phase1.py
+	./phase1.py $queue $mu $lambda
 done

@@ -7,6 +7,6 @@ queues="1 20 50"
 for queue in $queues; do
 	for lambda in $lambdas; do
 		echo "Running with mu=$mu, queue=$queue, lambda=$lambda"
-		./phase1.py
+		./phase1.py $queue $mu $lambda
 	done
 done
