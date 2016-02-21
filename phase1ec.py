@@ -42,7 +42,7 @@ class Event:
     """
 
     def __init__(self, time=0, eventType=0, packetNumber = -1, queueLength = 0):
-       self.time = time
+        self.time = time
         self.eventType = eventType
         self.packetNumber = packetNumber
         self.msg = None
@@ -74,10 +74,18 @@ class Packet:
 
 
 
+def pareto_dist(rate):
+    """
+    Pareto Distribution
+    """ 
+    u = random()
+    return 1/((1-u)**(1/rate))
+
+
 def exp_dist(rate):
     """
-    Exponential Distribution
-    """ 
+    Negative Exponential Distribution
+    """
     u = random()
     return ((-1/rate) * log(1-u))
 
@@ -94,7 +102,7 @@ def arrival(pq, eventList):
 
     global packetCount
     if(packetCount < MAX_PACKETS): # limits simulation length
-        nextTime = currentEvent.time + exp_dist(ARRIVAL_RATE) 
+        nextTime = currentEvent.time + pareto_dist(ARRIVAL_RATE) 
         insort(eventList, Event(time=nextTime, eventType=ARRIVAL))
         packetCount += 1
 
@@ -151,7 +159,6 @@ def main():
     DEPARTURE_RATE = float(sys.argv[2])
     ARRIVAL_RATE = float(sys.argv[3])
     outfile = str(sys.argv[4])
-
     print "Writing output to file: %s" % outfile
     print "Queue Length: %d" % queueLength
     print "ARRIVAL_RATE: %f" % ARRIVAL_RATE

@@ -1,0 +1,1 @@
+ARRIVAL_RATE, DEPARTURE_RATE, queueLength, statistics.meanQueueLength, utilization, statistics.packetsDropped
