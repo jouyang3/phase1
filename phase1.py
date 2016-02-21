@@ -20,28 +20,41 @@ DEPARTURE_RATE = 0.5
 currentIndex = -1 # position of current event to be examined
 packetCount = -1 # count of packets sent; used to limit simulation
 
+
+class Statistics:
+    """
+    Statistics outputs
+    """
+    
+    def __init__(self, busyTime = 0, meanQueueLength = 0, packetsDropped = 0 ):
+        self.busyTime = busyTime
+        self.meanQueueLength = meanQueueLength
+        self.packetsDropped = packetsDropped
+
+
 # statistics
-busyTime = 0
+statistics = Statistics(busyTime = 0, meanQueueLength = 0, packetsDropped = 0)
 
 class Event:
     """
     Event class
     """
 
-    def __init__(self, time=0, eventType=0, packetNumber = -1):
+    def __init__(self, time=0, eventType=0, packetNumber = -1, queueLength = 0):
         self.time = time
         self.eventType = eventType
         self.packetNumber = packetNumber
         self.msg = None
+        self.queueLength = queueLength
 
     def __lt__(self, other):
         return self.time < other.time
 
     def __repr__(self):
-        return "<time = %d, eventType = %d, packetNumber = %d, msg = %s>" % (self.time, self.eventType, self.packetNumber, self.msg)
+        return "<time = %d, eventType = %d, packetNumber = %d, queueLength = %d, msg = %s>" % (self.time, self.eventType, self.packetNumber, self.queueLength, self.msg)
 
     def __str__(self):
-        return "<time = %d, eventType = %d, packetNumber = %d>" % (self.time, self.eventType, self.packetNumber, self.msg)
+        return "<time = %d, eventType = %d, packetNumber = %d, queueLength = %d, msg = %s>" % (self.time, self.eventType, self.packetNumber, self.queueLength, self.msg)
 
 
 class Packet:
@@ -94,12 +107,14 @@ def arrival(pq, eventList):
         insort(eventList, Event(time=dtime, eventType=DEPARTURE))
 
     
-    print "nextTime = ", nextTime, " dtime = ", dtime
+    #print "nextTime = ", nextTime, " dtime = ", dtime
 
     if(not pq.full()):
         pq.put(item = p, block = False)
     else: # queue is full, drop packet
         currentEvent.msg = "PACKET DROPPED"
+        global statistics
+        statistics.packetsDropped += 1 
         print ("Dropping %dth Packet" % p.packetNumber)
 
 
@@ -107,13 +122,15 @@ def arrival(pq, eventList):
 def departure(pq, eventList):
     """
     Process and Generate Departure Events
-    """ 
+    """
+    global currentIndex 
     currentEvent = eventList[currentIndex]
    
     packet = pq.get()
+
+    global statistics
+    statistics.busyTime += packet.serviceTime
    
-    print ("Departure: dtime: %f, serviceTime: %f, type %d" % (currentEvent.time, packet.serviceTime, currentEvent.eventType)) 
-    global busyTime
     if(not pq.empty()): # send packet if one exists in queue
         dtime = packet.serviceTime + currentEvent.time
         insort(eventList, Event(time=dtime, eventType=DEPARTURE))
@@ -144,11 +161,9 @@ def main():
     # initialize event list with arrival event
     currentEvent = Event(time=0, eventType=ARRIVAL)
     eventList = sorted([currentEvent])
+    
+    global currentIndex
     currentIndex = 0
-
-    # statistics
-    global busyTime
-    busyTime = 0
 
 	# Begin simulation with no packets simulated
     global packetCount
@@ -156,22 +171,22 @@ def main():
 
     while(currentIndex < len(eventList)):
         currentEvent = eventList[currentIndex]
-        if(currentIndex > 0):
-            busyTime += currentEvent.time - eventList[currentIndex-1].time
-        
         if(currentEvent.eventType == ARRIVAL):
             arrival(pq, eventList)
-        else:    
+        else:
             departure(pq, eventList)
         
-        
+        currentEvent.queueLength = pq.qsize()
+        print "queueLength: %d." % currentEvent.queueLength
         currentIndex += 1
 
-    utilization = busyTime/eventList[-1].time    
-    print "Total Busy Duration: %f" % busyTime
+    global statistics
+    utilization = statistics.busyTime/eventList[-1].time    
+    print "Total Busy Duration: %f" % statistics.busyTime
     print "Total Runtime: %f" % eventList[-1].time
     print "Utilization = %f" % utilization
 
+    print "Total Packets Dropped = %d" % statistics.packetsDropped 
 if __name__ == '__main__':
     main()
 

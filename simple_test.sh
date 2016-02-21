@@ -1,7 +1,7 @@
 #!/bin/bash
-queueLength=20
-mu=10
-lambda=0.1
+queueLength=1
+mu=0.1
+lambda=0.5
 ./phase1.py $queueLength $mu $lambda
 
 
