@@ -1,0 +1,26 @@
+Queue Length: 20
+ARRIVAL_RATE: 0.100000
+DEPARTURE_RATE: 10.000000
+1th Packet Arriving, Arrival Time: 0.000000.
+nextTime =  0.46682154773  dtime =  0.022746157917
+Departure: dtime: 0.466822, serviceTime: 0.022746, type 0
+Transmitting 1th Packet, Departure Time: 0.466822
+2th Packet Arriving, Arrival Time: 0.466822.
+nextTime =  12.8154031994  dtime =  0.482235606949
+Departure: dtime: 12.815403, serviceTime: 0.015414, type 0
+Transmitting 2th Packet, Departure Time: 12.815403
+3th Packet Arriving, Arrival Time: 12.815403.
+nextTime =  32.4773166161  dtime =  12.84642491
+Departure: dtime: 32.477317, serviceTime: 0.031022, type 0
+Transmitting 3th Packet, Departure Time: 32.477317
+4th Packet Arriving, Arrival Time: 32.477317.
+nextTime =  32.5927094428  dtime =  32.5352932056
+Departure: dtime: 32.592709, serviceTime: 0.057977, type 0
+Transmitting 4th Packet, Departure Time: 32.592709
+5th Packet Arriving, Arrival Time: 32.592709.
+nextTime =  0  dtime =  32.6110068684
+Departure: dtime: 32.611007, serviceTime: 0.018297, type 1
+Transmitting 5th Packet, Departure Time: 32.611007
+Total Busy Duration: 32.611007
+Total Runtime: 32.611007
+Utilization = 1.000000

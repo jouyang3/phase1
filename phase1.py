@@ -1,4 +1,4 @@
-#!/bin/python2.7
+#!/usr/bin/python2.7
 
 import sys
 
@@ -11,17 +11,17 @@ from math import *
 # Constants
 ARRIVAL = 0
 DEPARTURE = 1
-MAX_PACKETS = 10000
+MAX_PACKETS = 5
 
 
 ARRIVAL_RATE = 0.5
 DEPARTURE_RATE = 0.5
 
-time = 0 # current simulation time
 currentIndex = -1 # position of current event to be examined
 packetCount = -1 # count of packets sent; used to limit simulation
 
-
+# statistics
+busyTime = 0
 
 class Event:
     """
@@ -42,7 +42,6 @@ class Event:
 
     def __str__(self):
         return "<time = %d, eventType = %d, packetNumber = %d>" % (self.time, self.eventType, self.packetNumber, self.msg)
-
 
 
 class Packet:
@@ -76,6 +75,8 @@ def arrival(pq, eventList):
     """ 
     currentEvent = eventList[currentIndex]
     
+    nextTime = 0
+    dtime = 0
 
     global packetCount
     if(packetCount < MAX_PACKETS): # limits simulation length
@@ -86,15 +87,18 @@ def arrival(pq, eventList):
     serviceTime = exp_dist(DEPARTURE_RATE)
     p = Packet(serviceTime)
 
-    print ("%dth Packet Arriving." % p.packetNumber)
+    print ("%dth Packet Arriving, Arrival Time: %f." % (p.packetNumber, currentEvent.time))
 
     if(pq.empty()): # create departure event if queue is empty
         dtime = serviceTime+currentEvent.time
         insort(eventList, Event(time=dtime, eventType=DEPARTURE))
 
-    try: # enqueue packet
+    
+    print "nextTime = ", nextTime, " dtime = ", dtime
+
+    if(not pq.full()):
         pq.put(item = p, block = False)
-    except (Full): # queue is full, drop packet
+    else: # queue is full, drop packet
         currentEvent.msg = "PACKET DROPPED"
         print ("Dropping %dth Packet" % p.packetNumber)
 
@@ -105,13 +109,15 @@ def departure(pq, eventList):
     Process and Generate Departure Events
     """ 
     currentEvent = eventList[currentIndex]
-
+   
+    packet = pq.get()
+   
+    print ("Departure: dtime: %f, serviceTime: %f, type %d" % (currentEvent.time, packet.serviceTime, currentEvent.eventType)) 
+    global busyTime
     if(not pq.empty()): # send packet if one exists in queue
-        packet = pq.get()
         dtime = packet.serviceTime + currentEvent.time
         insort(eventList, Event(time=dtime, eventType=DEPARTURE))
-        print ("Transmitting %dth Packet" % packet.packetNumber)
-
+    print ("Transmitting %dth Packet, Departure Time: %f" % (packet.packetNumber, currentEvent.time))
 
 
 def main():
@@ -123,43 +129,48 @@ def main():
     global MAX_PACKETS
     global ARRIVAL_RATE
     global DEPARTURE_RATE
-    MAX_PACKETS = int(sys.argv[1])
-    ARRIVAL_RATE = float(sys.argv[2])
-    DEPARTURE_RATE = float(sys.argv[3])
+    queueLength = int(sys.argv[1])
+    ARRIVAL_RATE = float(sys.argv[3])
+    DEPARTURE_RATE = float(sys.argv[2])
 
-    print "MAX_PACKETS: %d" % MAX_PACKETS
-    print "ARRIVAL_RATE: %d" % ARRIVAL_RATE
+    print "Queue Length: %d" % queueLength
+    print "ARRIVAL_RATE: %f" % ARRIVAL_RATE
     print "DEPARTURE_RATE: %f" % DEPARTURE_RATE
 
-    pq = Queue(MAX_PACKETS) # packet queue
+    pq = Queue(queueLength) # packet queue
 
-    seed(1) # seed for generating random distributions
+    seed(200) # seed for generating random distributions
     
     # initialize event list with arrival event
     currentEvent = Event(time=0, eventType=ARRIVAL)
     eventList = sorted([currentEvent])
     currentIndex = 0
 
-    nextArrivalTime = currentEvent.time + exp_dist(ARRIVAL_RATE);
-    p = Packet(serviceTime = random())
-    
-    nextArrival = Event(time=nextArrivalTime, eventType=ARRIVAL)
-    insort(eventList, nextArrival)
-    
+    # statistics
+    global busyTime
+    busyTime = 0
+
 	# Begin simulation with no packets simulated
     global packetCount
-    packetCount = 0
+    packetCount = 1
 
     while(currentIndex < len(eventList)):
         currentEvent = eventList[currentIndex]
+        if(currentIndex > 0):
+            busyTime += currentEvent.time - eventList[currentIndex-1].time
+        
         if(currentEvent.eventType == ARRIVAL):
             arrival(pq, eventList)
-        else:
+        else:    
             departure(pq, eventList)
         
+        
         currentIndex += 1
-    
 
+    utilization = busyTime/eventList[-1].time    
+    print "Total Busy Duration: %f" % busyTime
+    print "Total Runtime: %f" % eventList[-1].time
+    print "Utilization = %f" % utilization
 
 if __name__ == '__main__':
     main()
