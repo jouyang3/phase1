@@ -42,7 +42,7 @@ class Event:
     """
 
     def __init__(self, time=0, eventType=0, packetNumber = -1, queueLength = 0):
-       self.time = time
+        self.time = time
         self.eventType = eventType
         self.packetNumber = packetNumber
         self.msg = None
@@ -81,9 +81,16 @@ def exp_dist(rate):
     u = random()
     return ((-1/rate) * log(1-u))
 
+def pareto_dist(rate):
+    """
+    Pareto Distribution
+    """ 
+    u = random()
+    return 1/((1-u)**(1/rate))
 
 
-def arrival(pq, eventList):
+
+def arrival(pq, eventList, paretoFlag):
     """
     Process and Generate Arrival Events
     """ 
@@ -94,7 +101,11 @@ def arrival(pq, eventList):
 
     global packetCount
     if(packetCount < MAX_PACKETS): # limits simulation length
-        nextTime = currentEvent.time + exp_dist(ARRIVAL_RATE) 
+        if(paretoFlag):
+            nextTime = currentEvent.time + pareto_dist(ARRIVAL_RATE) 
+        else:
+            nextTime = currentEvent.time + exp_dist(ARRIVAL_RATE) 
+
         insort(eventList, Event(time=nextTime, eventType=ARRIVAL))
         packetCount += 1
 
@@ -140,8 +151,8 @@ def departure(pq, eventList):
 
 def main():
     # Argument Handling
-    if(len(sys.argv) != 5):
-        print("usage:", str(sys.argv[0]), "[queue] [mu] [lambda] [outfile]")
+    if(len(sys.argv) != 6):
+        print("usage:", str(sys.argv[0]), "[queue] [mu] [lambda] [outfile] [pareto]")
         return
 
     global MAX_PACKETS
@@ -151,6 +162,7 @@ def main():
     DEPARTURE_RATE = float(sys.argv[2])
     ARRIVAL_RATE = float(sys.argv[3])
     outfile = str(sys.argv[4])
+    paretoFlag = str(sys.argv[5])
 
     print "Writing output to file: %s" % outfile
     print "Queue Length: %d" % queueLength
@@ -177,7 +189,7 @@ def main():
     while(currentIndex < len(eventList)):
         currentEvent = eventList[currentIndex]
         if(currentEvent.eventType == ARRIVAL):
-            arrival(pq, eventList)
+            arrival(pq, eventList, paretoFlag)
         else:
             departure(pq, eventList)
         
