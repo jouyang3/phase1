@@ -28,8 +28,8 @@ xlabel('\lambda');
 ylabel('Average Queue Length');
 legend('Theoretical','Experimental')
 
+set(gcf,'PaperUnits','inches','PaperPosition',[0 0 8 6])
 print('queue_length.png','-dpng');
-
 
 % Utilization
 
@@ -45,6 +45,7 @@ xlabel('\lambda');
 ylabel('Utilization Factor');
 legend('Theoretical','Experimental')
 
+set(gcf,'PaperUnits','inches','PaperPosition',[0 0 8 6])
 print('utilization.png','-dpng');
 
 
@@ -66,4 +67,5 @@ xlabel('\lambda');
 ylabel('Dropped Packets');
 legend('1 element queue', '20 element queue', '50 element queue');
 
+set(gcf,'PaperUnits','inches','PaperPosition',[0 0 8 6])
 print('packets_dropped.png','-dpng');
