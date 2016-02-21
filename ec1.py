@@ -79,8 +79,8 @@ def exp_dist(rate):
     Exponential Distribution
     """ 
     u = random()
-    return ((-1/rate) * log(1-u))
-
+    #return ((-1/rate) * log(1-u))
+    return 1/((1-u)**(1/rate))
 
 
 def arrival(pq, eventList):
