@@ -7,6 +7,8 @@ queues="1 20 50"
 output1=statsp3.csv
 output2=statsp3ec.csv
 
+rm -f $output1 $output2
+
 for queue in $queues; do
 	for lambda in $lambdas; do
 		echo "Running with mu=$mu, queue=$queue, lambda=$lambda"

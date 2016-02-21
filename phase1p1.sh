@@ -6,7 +6,7 @@ queue=9999999 # "infinite" queue size
 outfile1="statsp1.csv"
 outfile2="statsp1ec.csv"
 
-rm -f "$outfile"
+rm -f "$outfile1" $output2
  
 for lambda in $lambdas; do
 	echo "Running with mu=$mu, queue=$queue, lambda=$lambda"

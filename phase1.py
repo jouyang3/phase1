@@ -11,7 +11,7 @@ from math import *
 # Constants
 ARRIVAL = 0
 DEPARTURE = 1
-MAX_PACKETS = 10000
+MAX_PACKETS = 100000
 
 
 ARRIVAL_RATE = 0.5
@@ -162,7 +162,7 @@ def main():
     DEPARTURE_RATE = float(sys.argv[2])
     ARRIVAL_RATE = float(sys.argv[3])
     outfile = str(sys.argv[4])
-    paretoFlag = str(sys.argv[5])
+    paretoFlag = int(sys.argv[5])
 
     print "Writing output to file: %s" % outfile
     print "Queue Length: %d" % queueLength
