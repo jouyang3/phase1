@@ -81,12 +81,13 @@ def exp_dist(rate):
     u = random()
     return ((-1/rate) * log(1-u))
 
+# times 10 rate
 def pareto_dist(rate):
     """
     Pareto Distribution
     """ 
     u = random()
-    return 1/((1-u)**(1/rate))
+    return 1/((1-u)**(1/(rate*10)))
 
 
 
